@@ -17,7 +17,7 @@ class ConvolutionalLayer:
         # self.input_shape = input_shape
         self.number_of_input_channel = number_of_input_channel
 
-        if stride != 0:
+        if stride > 0:
             self.output_shape = (number_of_output_channel,
                                  np.int((input_height - filter_dimension + 2 * padding) / stride) + 1,
                                  np.int((input_width - filter_dimension + 2 * padding) / stride) + 1)
@@ -42,5 +42,5 @@ class ConvolutionalLayer:
             for j in range(self.number_of_input_channel):
                 # print(self.filters_weights[i, j].shape)
                 self.output[i] += cross_correlation2d(self.input[j], self.filters_weights[i, j], stride=self.stride,
-                                                      padding=self.padding, result_shape=self.output_shape)
+                                                      padding=self.padding, result_shape=self.output_shape[1:])
         return self.output

@@ -9,6 +9,7 @@ from convolutionalLayer import ConvolutionalLayer
 from maxPoolingLayer import MaxPoolingLayer
 from fullyConnectedLayer import FullyConnectedLayer
 from activationReLUlayer import ActivationReLuLayer
+from flattenLayer import FlattenLayer
 from softMaxLayer import SoftMaxLayer
 
 if __name__ == "__main__":
@@ -29,14 +30,14 @@ if __name__ == "__main__":
                               padding=0).forward(out6)
     out8 = ActivationReLuLayer().forward(out7)
 
-    print(out8)
+    # print(out8)
 
-    out10 = FullyConnectedLayer(output_dimension=10).forward(out8)
+    out9 = FlattenLayer().forward(out8)
 
-
+    out10 = FullyConnectedLayer(output_dimension=10).forward(out9)
 
     out11 = SoftMaxLayer().forward(out10)
-    # print(out11)
+    print(out11)
 
     # layer2 = MaxPoolingLayer(input_shape=o1.shape, filter_dimension=2, stride=2)
     # o2 = layer2.forward(o1)

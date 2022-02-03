@@ -1,4 +1,7 @@
 import numpy as np
+from keras.utils import np_utils
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.datasets import cifar10
 
 
 def file_read(file_path: str):
@@ -40,8 +43,8 @@ def pad_input_2d_mat(X, pad: int, padding_value: int = 0):
 
 
 def cross_correlation2d(input_mat, filter_mat, stride, padding, result_shape):
-    filter_dimension, _ = filter_mat.shape
-    _, result_height, result_width = result_shape
+    filter_dimension = filter_mat.shape[0]
+    result_height, result_width = result_shape
 
     result = np.zeros((result_height, result_width), dtype='float64')
 
@@ -75,10 +78,43 @@ def convolution2d(input_mat, filter_mat, stride, padding, result_shape):
 
 
 def flatten_matrix(input_data):
-    return input_data.flatten().reshape(-1, 1)
+    return input_data.flatten().reshape((-1, 1))
 
 
 def softmax(input_data):
     exponent = np.exp(input_data)
     exponent_sum = np.sum(exponent)
     return exponent / exponent_sum
+
+
+def preprocess_mnist_data(x, y):
+    x = x.reshape(len(x), 1, 28, 28)
+    x = x.astype("float64") / 255
+    # y = np_utils.to_categorical(y) # confusion
+    y = y.reshape(-1, 1)
+
+    return x, y
+
+
+def preprocess_cifar10_data(x, y): # dimension (60k, 32, 32, 3)
+    x = np.transpose(x, (0, 3, 1, 2)) # changed dimension (60k, 3, 32, 32)
+    x = x.astype("float64") / 255
+    # y = np_utils.to_categorical(y) # confusion
+
+    return x, y
+
+
+def mnist_dataset_load_and_preprocess():
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    x_train, y_train = preprocess_mnist_data(x_train, y_train)
+    x_test, y_test = preprocess_mnist_data(x_test, y_test)
+
+    return x_train, y_train, x_test, y_test
+
+
+def cifar10_dataset_load_and_preprocess():
+    (x_train, y_train), (x_test, y_test) = cifar10.load_data()  # dimension (60k, 32, 32, 3)
+    x_train, y_train = preprocess_cifar10_data(x_train, y_train)
+    x_test, y_test = preprocess_cifar10_data(x_test, y_test)
+
+    return x_train, y_train, x_test, y_test
