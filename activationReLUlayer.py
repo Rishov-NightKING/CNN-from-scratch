@@ -14,4 +14,4 @@ class ActivationReLuLayer:
         return self.output
 
     def backward(self, output_gradient, learning_rate):
-        return np.dot(output_gradient, relu_derivative(self.input))
+        return output_gradient * relu_derivative(self.input)

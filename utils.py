@@ -82,7 +82,7 @@ def flatten_matrix(input_data):
 
 
 def softmax(input_data):
-    exponent = np.exp(input_data)
+    exponent = np.exp(input_data-np.max(input_data))
     exponent_sum = np.sum(exponent)
     return exponent / exponent_sum
 
@@ -95,8 +95,10 @@ def generate_true_value_in_max_value_position(specific_window):
 def preprocess_mnist_data(x, y):
     x = x.reshape(len(x), 1, 28, 28)
     x = x.astype("float64") / 255
-    # y = np_utils.to_categorical(y) # confusion
     y = y.reshape(-1, 1)
+    y = np_utils.to_categorical(y)  # confusion
+    new_y_shape = y.shape + (1,)
+    y = np.reshape(y, new_y_shape)
 
     return x, y
 
@@ -104,7 +106,9 @@ def preprocess_mnist_data(x, y):
 def preprocess_cifar10_data(x, y):  # dimension (60k, 32, 32, 3)
     x = np.transpose(x, (0, 3, 1, 2))  # changed dimension (60k, 3, 32, 32)
     x = x.astype("float64") / 255
-    # y = np_utils.to_categorical(y) # confusion
+    y = np_utils.to_categorical(y)  # confusion
+    new_y_shape = y.shape + (1, )
+    y = np.reshape(y, new_y_shape)
 
     return x, y
 
@@ -114,7 +118,15 @@ def mnist_dataset_load_and_preprocess():
     x_train, y_train = preprocess_mnist_data(x_train, y_train)
     x_test, y_test = preprocess_mnist_data(x_test, y_test)
 
-    return x_train, y_train, x_test, y_test
+    test_len = int(len(x_test) / 2)
+
+    x_test_new = x_test[0:test_len]
+    y_test_new = y_test[0:test_len]
+
+    x_valid = x_test[test_len:]
+    y_valid = y_test[test_len:]
+
+    return x_train, y_train, x_valid, y_valid, x_test_new, y_test_new
 
 
 def cifar10_dataset_load_and_preprocess():
@@ -122,7 +134,15 @@ def cifar10_dataset_load_and_preprocess():
     x_train, y_train = preprocess_cifar10_data(x_train, y_train)
     x_test, y_test = preprocess_cifar10_data(x_test, y_test)
 
-    return x_train, y_train, x_test, y_test
+    test_len = int(len(x_test) / 2)
+
+    x_test_new = x_test[0:test_len]
+    y_test_new = y_test[0:test_len]
+
+    x_valid = x_test[test_len:]
+    y_valid = y_test[test_len:]
+
+    return x_train, y_train, x_valid, y_valid, x_test_new, y_test_new
 
 
 def binary_cross_entropy_loss(y_true, y_pred):
@@ -131,6 +151,10 @@ def binary_cross_entropy_loss(y_true, y_pred):
 
 def binary_cross_entropy_loss_derivative(y_true, y_pred):
     return ((1 - y_true) / (1 - y_pred) - y_true / y_pred) / np.size(y_true)
+
+
+def cross_entropy_loss(y_true, y_pred):
+    return -np.sum(y_true * np.log(y_pred))
 
 
 def random_mini_batches(X, Y, mini_batch_size=64, seed=0):
@@ -178,6 +202,5 @@ def random_mini_batches(X, Y, mini_batch_size=64, seed=0):
 
 
 def relu_derivative(x):
-    x[x <= 0] = 0.1 * x # leaky ReLU
-    x[x > 0] = 1
+    x = np.where(x > 0, x, x * 0.01)
     return x

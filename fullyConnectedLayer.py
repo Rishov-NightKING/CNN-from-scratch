@@ -10,15 +10,15 @@ class FullyConnectedLayer:
         self.input_dimension = input_dimension
         self.output_dimension = output_dimension
 
-        self.weights = np.random.randn(self.output_dimension, self.input_dimension) / self.input_dimension
+        self.weights = np.random.randn(self.output_dimension, self.input_dimension) / (output_dimension * input_dimension)
         # changed here 100 diye divide / input dimension diye
         self.bias = np.random.randn(output_dimension, 1)
-        # self.bias = np.full((output_dimension, 1), 20, dtype='float64')
+        # self.bias = np.full((output_dimension, 1), 0.20, dtype='float64')
+        # self.weights = np.full((self.output_dimension, self.input_dimension), 0.15, dtype='float64') / 10000
 
     def forward(self, input_data):
         self.input = input_data
 
-        # self.weights = np.full((self.output_dimension, self.input_dimension), 15, dtype='float64')
         self.output = np.matmul(self.weights, self.input) + self.bias
 
         return self.output

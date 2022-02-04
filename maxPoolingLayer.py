@@ -42,11 +42,11 @@ class MaxPoolingLayer:
         return self.output
 
     def backward(self, output_gradient, learning_rate):
-        _, output_height, output_width = output_gradient.shape
+        output_channel, output_height, output_width = output_gradient.shape
 
         output_gradient_previous = np.zeros(self.input_shape)
 
-        for c in range(self.number_of_input_channel):
+        for c in range(output_channel):
             for h in range(output_height):
                 vertical_start = self.stride * h
                 vertical_end = vertical_start + self.filter_dimension
