@@ -87,6 +87,11 @@ def softmax(input_data):
     return exponent / exponent_sum
 
 
+def generate_true_value_in_max_value_position(specific_window):
+    new_window = (specific_window == np.max(specific_window))
+    return new_window
+
+
 def preprocess_mnist_data(x, y):
     x = x.reshape(len(x), 1, 28, 28)
     x = x.astype("float64") / 255
@@ -96,8 +101,8 @@ def preprocess_mnist_data(x, y):
     return x, y
 
 
-def preprocess_cifar10_data(x, y): # dimension (60k, 32, 32, 3)
-    x = np.transpose(x, (0, 3, 1, 2)) # changed dimension (60k, 3, 32, 32)
+def preprocess_cifar10_data(x, y):  # dimension (60k, 32, 32, 3)
+    x = np.transpose(x, (0, 3, 1, 2))  # changed dimension (60k, 3, 32, 32)
     x = x.astype("float64") / 255
     # y = np_utils.to_categorical(y) # confusion
 
@@ -118,3 +123,61 @@ def cifar10_dataset_load_and_preprocess():
     x_test, y_test = preprocess_cifar10_data(x_test, y_test)
 
     return x_train, y_train, x_test, y_test
+
+
+def binary_cross_entropy_loss(y_true, y_pred):
+    return np.mean(-y_true * np.log(y_pred) - (1 - y_true) * np.log(1 - y_pred))
+
+
+def binary_cross_entropy_loss_derivative(y_true, y_pred):
+    return ((1 - y_true) / (1 - y_pred) - y_true / y_pred) / np.size(y_true)
+
+
+def random_mini_batches(X, Y, mini_batch_size=64, seed=0):
+    """
+    Creates a list of random minibatches from (X, Y)
+    Arguments:
+    X -- input data, of shape (input size, number of examples) (m, Hi, Wi, Ci)
+    Y -- true "label" vector (containing 0 if cat, 1 if non-cat), of shape (1, number of examples) (m, n_y)
+    mini_batch_size - size of the mini-batches, integer
+    seed -- this is only for the purpose of grading, so that you're "random minibatches are the same as ours.
+    Returns:
+    mini_batches -- list of synchronous (mini_batch_X, mini_batch_Y)
+    """
+
+    m = X.shape[0]  # number of training examples
+    mini_batches = []
+    np.random.seed(seed)
+
+    # Step 1: Shuffle (X, Y)
+    permutation = list(np.random.permutation(m))
+    shuffled_X = X[permutation, :, :, :]
+    shuffled_Y = Y[permutation, :]
+
+    # Step 2: Partition (shuffled_X, shuffled_Y). Minus the end case.
+    # number of mini batches of size mini_batch_size in your partitionning
+    num_complete_minibatches = math.floor(m / mini_batch_size)
+    for k in range(0, num_complete_minibatches):
+        mini_batch_X = shuffled_X[k * mini_batch_size: k *
+                                                       mini_batch_size + mini_batch_size, :, :, :]
+        mini_batch_Y = shuffled_Y[k * mini_batch_size: k *
+                                                       mini_batch_size + mini_batch_size, :]
+        mini_batch = (mini_batch_X, mini_batch_Y)
+        mini_batches.append(mini_batch)
+
+    # Handling the end case (last mini-batch < mini_batch_size)
+    if m % mini_batch_size != 0:
+        mini_batch_X = shuffled_X[num_complete_minibatches *
+                                  mini_batch_size: m, :, :, :]
+        mini_batch_Y = shuffled_Y[num_complete_minibatches *
+                                  mini_batch_size: m, :]
+        mini_batch = (mini_batch_X, mini_batch_Y)
+        mini_batches.append(mini_batch)
+
+    return mini_batches
+
+
+def relu_derivative(x):
+    x[x <= 0] = 0.1 * x # leaky ReLU
+    x[x > 0] = 1
+    return x

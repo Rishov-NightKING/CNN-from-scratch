@@ -14,17 +14,12 @@ class ConvolutionalLayer:
         self.padding = padding
 
         number_of_input_channel, input_height, input_width = input_shape  # (d, h, w)
-        # self.input_shape = input_shape
+        self.input_shape = input_shape
         self.number_of_input_channel = number_of_input_channel
 
-        if stride > 0:
-            self.output_shape = (number_of_output_channel,
-                                 np.int((input_height - filter_dimension + 2 * padding) / stride) + 1,
-                                 np.int((input_width - filter_dimension + 2 * padding) / stride) + 1)
-        else:
-            self.output_shape = (number_of_output_channel,
-                                 np.int(input_height - filter_dimension + 2 * padding) + 1,
-                                 np.int(input_width - filter_dimension + 2 * padding) + 1)
+        self.output_shape = (number_of_output_channel,
+                             np.int((input_height - filter_dimension + 2 * padding) / stride) + 1,
+                             np.int((input_width - filter_dimension + 2 * padding) / stride) + 1)
 
         # self.filters_shape = (number_of_output_channel, number_of_input_channel, filter_dimension, filter_dimension)
         # self.filters_weights = np.full(self.filters_shape, 5, dtype='float64')
@@ -44,3 +39,17 @@ class ConvolutionalLayer:
                 self.output[i] += cross_correlation2d(self.input[j], self.filters_weights[i, j], stride=self.stride,
                                                       padding=self.padding, result_shape=self.output_shape[1:])
         return self.output
+
+    def backward(self, output_gradient, learning_rate): # output_gradient = dE/dY(i)
+        filters_gradient = np.zeros(self.number_of_output_channel, self.number_of_input_channel,
+                                    self.filter_dimension, self.filter_dimension) # dE/dK(i,j)
+        input_gradient = np.zeros(self.input_shape) # dE *(full) K(i,j)
+        bias_gradient = output_gradient # dE/dY(i)
+
+        for i in range(self.number_of_output_channel):
+            for j in range(self.number_of_input_channel):
+                filters_gradient[i, j] = 0
+
+
+
+

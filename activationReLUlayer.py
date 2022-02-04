@@ -1,4 +1,5 @@
 import numpy as np
+from utils import relu_derivative
 
 
 class ActivationReLuLayer:
@@ -11,3 +12,6 @@ class ActivationReLuLayer:
         self.output = np.maximum(0, input_data)
 
         return self.output
+
+    def backward(self, output_gradient, learning_rate):
+        return np.dot(output_gradient, relu_derivative(self.input))

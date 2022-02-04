@@ -12,5 +12,5 @@ class FlattenLayer:
 
         return self.output
 
-    def backward(self, output_error, learning_rate):
-        return output_error.reshape(self.input.shape)
+    def backward(self, output_gradient, learning_rate):
+        return output_gradient.reshape(self.input.shape)
