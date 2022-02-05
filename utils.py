@@ -53,19 +53,16 @@ def cross_correlation2d(input_mat, filter_mat, stride, padding, result_shape):
     else:
         pad_input = input_mat
 
-    for h in range(result_height):  # loop over vertical axis of the output volume
-        # Find the vertical start and end of the current "slice" (≈2 lines)
+    for h in range(result_height):
         vertical_start = stride * h
         vertical_end = vertical_start + filter_dimension
 
-        for w in range(result_width):  # loop over horizontal axis of the output volume
-            # Find the horizontal start and end of the current "slice" (≈2 lines)
+        for w in range(result_width):
             horizontal_start = stride * w
             horizontal_end = horizontal_start + filter_dimension
 
             input_slice = pad_input[vertical_start:vertical_end, horizontal_start:horizontal_end]
             result[h, w] = np.sum(np.multiply(input_slice, filter_mat))
-            # print(result[h, w])
 
     return result
 
@@ -77,14 +74,12 @@ def convolution2d(input_mat, filter_mat, stride, padding, result_shape):
     return cross_correlation2d(input_mat, rotated_filter, stride, padding, result_shape)
 
 
-
-
 def flatten_matrix(input_data):
     return input_data.flatten().reshape((-1, 1))
 
 
 def softmax(input_data):
-    exponent = np.exp(input_data-np.max(input_data))
+    exponent = np.exp(input_data - np.max(input_data))
     exponent_sum = np.sum(exponent)
     return exponent / exponent_sum
 
@@ -98,7 +93,7 @@ def preprocess_mnist_data(x, y):
     x = x.reshape(len(x), 1, 28, 28)
     x = x.astype("float64") / 255
     y = y.reshape(-1, 1)
-    y = np_utils.to_categorical(y)  # confusion
+    y = np_utils.to_categorical(y)
     new_y_shape = y.shape + (1,)
     y = np.reshape(y, new_y_shape)
 
@@ -108,8 +103,8 @@ def preprocess_mnist_data(x, y):
 def preprocess_cifar10_data(x, y):  # dimension (60k, 32, 32, 3)
     x = np.transpose(x, (0, 3, 1, 2))  # changed dimension (60k, 3, 32, 32)
     x = x.astype("float64") / 255
-    y = np_utils.to_categorical(y)  # confusion
-    new_y_shape = y.shape + (1, )
+    y = np_utils.to_categorical(y)
+    new_y_shape = y.shape + (1,)
     y = np.reshape(y, new_y_shape)
 
     return x, y

@@ -53,13 +53,24 @@ if __name__ == "__main__":
     thread = ElapsedTimeThread()
     thread.start()
 
-    print("\n Training started.....")
+    print("\n   **************Training started****************\n")
 
-    model.train_model(x_train[0:1000], y_train[0:1000], learning_rate=0.001, number_of_epochs=2)
+    model.train_model(x_train[0:100], y_train[0:100], x_valid[0:100], y_valid[0:100], learning_rate=0.001, number_of_epochs=2)
 
     thread.stop()
     thread.join()
-    print("\nTraining finished in {:.3f} seconds".format(time.time() - start))
+    print("\nTraining finished in {:.3f} seconds\n\n".format(time.time() - start))
 
-    model.predict(x_test, y_test)
+    start = time.time()
+    thread = ElapsedTimeThread()
+    thread.start()
+
+    print("\n   ****************Testing started*********************\n")
+
+    accuracy, loss = model.predict(x_test[0:1000], y_test[0:1000])
+    print(f'\n    Test Accuracy: {accuracy}%\n    Test Average loss:{loss}\n')
+
+    thread.stop()
+    thread.join()
+    print("\nTesting finished in {:.3f} seconds\n".format(time.time() - start))
 

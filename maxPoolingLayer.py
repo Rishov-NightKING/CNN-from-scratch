@@ -4,9 +4,8 @@ from utils import generate_true_value_in_max_value_position
 
 class MaxPoolingLayer:
     # number of output channel = filter counts
-    def __init__(self, input_shape: (int, int, int), filter_dimension: int, stride: int):
+    def __init__(self, input_shape, filter_dimension: int, stride: int):
         self.input = None
-        # self.output = None
 
         self.filter_dimension = filter_dimension
         self.stride = stride
@@ -27,13 +26,10 @@ class MaxPoolingLayer:
         _, output_height, output_width = self.output_shape
 
         for c in range(self.number_of_input_channel):
-            for h in range(output_height):  # loop on the vertical axis of the output volume
-                # Find the vertical start and end of the current "slice" (≈2 lines)
+            for h in range(output_height):
                 vertical_start = self.stride * h
                 vertical_end = vertical_start + self.filter_dimension
-
-                for w in range(output_width):  # loop on the horizontal axis of the output volume
-                    # Find the vertical start and end of the current "slice" (≈2 lines)
+                for w in range(output_width):
                     horizontal_start = self.stride * w
                     horizontal_end = horizontal_start + self.filter_dimension
                     input_slice = self.input[c, vertical_start:vertical_end, horizontal_start:horizontal_end]
@@ -56,6 +52,6 @@ class MaxPoolingLayer:
                     input_slice = self.input[c, vertical_start:vertical_end, horizontal_start:horizontal_end]
                     new_window = generate_true_value_in_max_value_position(input_slice)
                     output_gradient_previous[c, vertical_start:vertical_end,
-                    horizontal_start:horizontal_end] += new_window * output_gradient[c, h, w]
+                                        horizontal_start:horizontal_end] += new_window * output_gradient[c, h, w]
 
         return output_gradient_previous

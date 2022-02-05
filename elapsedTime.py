@@ -3,8 +3,6 @@ import threading
 
 
 class ElapsedTimeThread(threading.Thread):
-    """"Stoppable thread that prints the time elapsed"""
-
     def __init__(self):
         super(ElapsedTimeThread, self).__init__()
         self._stop_event = threading.Event()
@@ -19,5 +17,5 @@ class ElapsedTimeThread(threading.Thread):
         thread_start = time.time()
         while not self.stopped():
             print("\rElapsed Time: {:.3f} seconds".format(time.time() - thread_start), end="")
-            # include a delay here so the thread doesn't uselessly thrash the CPU
+            # include a delay here so that the thread doesn't uselessly thrash the CPU
             time.sleep(0.01)
