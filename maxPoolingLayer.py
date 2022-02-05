@@ -56,6 +56,6 @@ class MaxPoolingLayer:
                     input_slice = self.input[c, vertical_start:vertical_end, horizontal_start:horizontal_end]
                     new_window = generate_true_value_in_max_value_position(input_slice)
                     output_gradient_previous[c, vertical_start:vertical_end,
-                        horizontal_start:horizontal_end] += new_window * output_gradient[c, h, w]
+                    horizontal_start:horizontal_end] += new_window * output_gradient[c, h, w]
 
         return output_gradient_previous

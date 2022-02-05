@@ -77,6 +77,8 @@ def convolution2d(input_mat, filter_mat, stride, padding, result_shape):
     return cross_correlation2d(input_mat, rotated_filter, stride, padding, result_shape)
 
 
+
+
 def flatten_matrix(input_data):
     return input_data.flatten().reshape((-1, 1))
 
@@ -154,7 +156,8 @@ def binary_cross_entropy_loss_derivative(y_true, y_pred):
 
 
 def cross_entropy_loss(y_true, y_pred):
-    return -np.sum(y_true * np.log(y_pred))
+    # return -np.sum(y_true * np.log(y_pred))
+    return -np.log(np.sum(y_true * y_pred))
 
 
 def random_mini_batches(X, Y, mini_batch_size=64, seed=0):
@@ -202,5 +205,5 @@ def random_mini_batches(X, Y, mini_batch_size=64, seed=0):
 
 
 def relu_derivative(x):
-    x = np.where(x > 0, x, x * 0.01)
+    x = np.where(x > 0, x, 0)
     return x

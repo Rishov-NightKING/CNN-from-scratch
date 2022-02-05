@@ -22,17 +22,20 @@ class ConvolutionalLayer:
                              np.int((input_width - filter_dimension + 2 * padding) / stride) + 1)
 
         self.filters_shape = (number_of_output_channel, number_of_input_channel, filter_dimension, filter_dimension)
-        # self.filters_weights = np.full(self.filters_shape, 0.5, dtype='float64')
-        self.biases = np.random.randn(*self.output_shape)
+
+        self.biases = np.random.randn(number_of_output_channel,
+                                      np.int((input_height - filter_dimension + 2 * padding) / stride) + 1,
+                                      np.int((input_width - filter_dimension + 2 * padding) / stride) + 1)
         self.filters_weights = np.random.randn(number_of_output_channel, number_of_input_channel, filter_dimension,
                                                filter_dimension)
+        self.filters_weights *= (np.sqrt(2)/np.prod(self.filters_weights.shape))
         # output = WX + b so biases are stored early here to add later
-
-        # self.biases = np.full(self.output_shape, 0.10, dtype='float64')
-        self.output = np.copy(self.biases)
+        # self.filters_weights = np.full(self.filters_shape, 0.5) / 100
+        # self.biases = np.full(self.output_shape, 0.1)
 
     def forward(self, input_data):
         self.input = input_data
+        self.output = np.copy(self.biases)
 
         for i in range(self.number_of_output_channel):
             for j in range(self.number_of_input_channel):
@@ -48,11 +51,13 @@ class ConvolutionalLayer:
 
         for i in range(self.number_of_output_channel):
             for j in range(self.number_of_input_channel):
-                filters_gradient[i, j] = cross_correlation2d(self.input[j], output_gradient[j],
+                filters_gradient[i, j] = cross_correlation2d(self.input[j], output_gradient[i],
                                                              stride=self.stride, padding=self.padding,
                                                              result_shape=(
                                                                  self.filter_dimension,
                                                                  self.filter_dimension))  # confusion
+
+        # print("conv: ", filters_gradient.mean())
 
         output_channel, output_height, output_width = output_gradient.shape
 
@@ -85,4 +90,10 @@ class ConvolutionalLayer:
         self.filters_weights -= learning_rate * filters_gradient
         self.biases -= learning_rate * bias_gradient
 
-        return dA_prev_pad[:, self.padding:-self.padding, self.padding:-self.padding]
+        # print("conv weight", self.filters_weights.mean())
+        # print("conv: ", output_gradient.mean())
+
+        if self.padding > 0:
+            return dA_prev_pad[:, self.padding:-self.padding, self.padding:-self.padding]
+        else:
+            return dA_prev_pad

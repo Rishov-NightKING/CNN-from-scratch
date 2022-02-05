@@ -23,15 +23,16 @@ class ConvolutionalNeuralNetwork:
                 for layer in self.forward_layers:
                     current_layer_predicted_output = layer.forward(current_layer_predicted_output)
 
-                current_layer_predicted_output = np.where(current_layer_predicted_output > 0,
-                                                          current_layer_predicted_output, 0.000000001)
+                # print("softmax: ", current_layer_predicted_output.max())
+                # current_layer_predicted_output = np.where(current_layer_predicted_output > 0,
+                #                                           current_layer_predicted_output, 0.000000001)
                 # print("forward passed successfully")
                 # print("pred ", current_layer_predicted_output
                 #print("real", real_value)
                 # # error calculation
                 # print(f"y_true_shape: {y_train[j].shape}  y_pred_shape: {current_layer_predicted_output.shape}")
                 loss = cross_entropy_loss(y_true=y_train[j], y_pred=current_layer_predicted_output)
-                #print(loss)
+                # print(f"sample: {j}      loss: {loss}")
                 per_epoch_loss += loss
 
                 # backward propagation of a layer
@@ -44,7 +45,7 @@ class ConvolutionalNeuralNetwork:
                 for layer in self.backward_layers:
                     output_gradient = layer.backward(output_gradient, learning_rate)
 
-            # per_epoch_loss /= number_of_train_samples
+            per_epoch_loss /= number_of_train_samples
             print(f'\nepoch: {epoch + 1} done....average loss: {per_epoch_loss}')
 
     def predict(self, x_test, y_test):

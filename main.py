@@ -15,7 +15,7 @@ from utils import file_read, mnist_dataset_load_and_preprocess, cifar10_dataset_
 if __name__ == "__main__":
     np.random.seed(1)
     x_train, y_train, x_valid, y_valid, x_test, y_test = mnist_dataset_load_and_preprocess()
-    # x_train, y_train, x_test, y_test = cifar10_dataset_load_and_preprocess()
+    # x_train, y_train, x_valid, y_valid, x_test, y_test = cifar10_dataset_load_and_preprocess()
 
     inputs_given_in_file = file_read(file_path='input.txt')
     model = ConvolutionalNeuralNetwork()
@@ -53,9 +53,13 @@ if __name__ == "__main__":
     thread = ElapsedTimeThread()
     thread.start()
 
-    model.train_model(x_train[0:100], y_train[0:100], learning_rate=0.005, number_of_epochs=2)
+    print("\n Training started.....")
+
+    model.train_model(x_train[0:1000], y_train[0:1000], learning_rate=0.001, number_of_epochs=2)
 
     thread.stop()
     thread.join()
     print("\nTraining finished in {:.3f} seconds".format(time.time() - start))
+
+    model.predict(x_test, y_test)
 
